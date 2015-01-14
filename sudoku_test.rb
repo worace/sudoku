@@ -9,7 +9,7 @@ require 'pry'
 describe Sudoku do
   before do
     @puzzle_string = File.read("./sample_puzzle.txt")
-    @solution_string = File.read("./sample_solution.txt")
+    @solution_string = File.read("./sample_solution.txt").chomp
     @board = Board.new(@puzzle_string)
     @sudoku = Sudoku.new(@board)
   end
@@ -19,7 +19,7 @@ describe Sudoku do
   end
 
   it "solves" do
-    skip
+    #skip
     assert_equal @solution_string, @sudoku.solution
   end
 end
@@ -42,6 +42,10 @@ describe Board do
     #row 0, col 1
     #[3,4,5,7,8,9]
     assert_equal ["3","4","5","7","8","9"], @board.common_digits(0,1)
+  end
+
+  it "finds common square digits for a spot" do
+    assert_equal %w(5 4 3 7 1), @board.common_square(0,5)
   end
 
   it "includes square in common digits" do

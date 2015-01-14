@@ -20,6 +20,7 @@ class Sudoku < Struct.new(:board)
         end
       end
     end
+    board.to_s
   end
 end
 
@@ -38,7 +39,12 @@ class Board
   end
 
   def common_digits(row, col)
-    ((rows[row] + columns[col]) - [" "]).uniq.sort
+    #how to include digits from the square
+    ((rows[row] + columns[col] + common_square(row, col)) - [" "]).uniq.sort
+  end
+
+  def common_square(row, col)
+    @puzzle[row/3*3,3].map { |s| s[col/3*3,3] }.flatten - [" "]
   end
 
   def solved?
@@ -47,5 +53,9 @@ class Board
 
   def not_solved?
     !solved?
+  end
+
+  def to_s
+    @puzzle.map { |r| r.join("") }.join("\n")
   end
 end
