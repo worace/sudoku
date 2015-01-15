@@ -33,6 +33,35 @@ describe Sudoku do
     sudoku_for("./sample_puzzle_2.txt").solution.inspect
   end
 
+  it "tells me which puzzles are solveable" do
+    #sample_puzzles/puzzle_0.txt
+    #sample_puzzles/puzzle_11.txt
+    #sample_puzzles/puzzle_16.txt
+    #sample_puzzles/puzzle_35.txt
+    #sample_puzzles/puzzle_39.txt
+    #sample_puzzles/puzzle_19.txt
+    #sample_puzzles/puzzle_37.txt
+    #sample_puzzles/puzzle_18.txt
+    #sample_puzzles/puzzle_7.txt
+    #sample_puzzles/puzzle_4.txt
+    #sample_puzzles/puzzle_15.txt
+    #sample_puzzles/puzzle_33.txt
+    solved = Dir.glob("sample_puzzles/*.txt").shuffle.map do |file|
+      sudoku = sudoku_for("./#{file}")
+      begin
+        Timeout::timeout(1) {
+          puts "attempting to solve puzzle #{file}"
+          sudoku.solution
+          puts "Solved a puzzle!"
+          file
+        }
+      rescue Timeout::Error
+        nil
+      end
+    end.compact
+    puts solved
+  end
+
   it "solves for a bunch" do
     skip
     Dir.glob("sample_puzzles/*.txt").shuffle.each do |file|
@@ -41,6 +70,7 @@ describe Sudoku do
         Timeout::timeout(4) {
           puts "attempting to solve puzzle #{file}"
           sudoku.solution
+          puts "Solved a puzzle!"
         }
       rescue Timeout::Error
         puts "puzzle #{file} failed to solve in time"
