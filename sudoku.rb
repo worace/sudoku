@@ -1,3 +1,4 @@
+require 'pry-byebug'
 class Sudoku < Struct.new(:board)
   #check for solution
   #check for contradiction -- board#invalid?
@@ -5,18 +6,36 @@ class Sudoku < Struct.new(:board)
   #choose spot with fewest possibilities
   # => insert lowest of those possibilities
   # attempt to solve
+
+            #if peer_possibilities.length == 8
+              #raise "boom" if (Board::DIGITS - [peer_possibilities]).length > 1
+              #raise "contradiction" unless spot.possibilities.include?((Board::DIGITS - [peer_possibilities]).first)
+              #spot.value = (Board::DIGITS - [peer_possibilities]).first
+              #changed = true
+            #end
+
+  def checked_boards
+    @checked_boards ||= Set.new
+  end
+
   def fill_known(board)
-    board.rows.each_with_index do |row, row_index|
-      row.each_with_index do |spot, column_index|
-        peer_possibilities = board.peer_possibilities(row_index, column_index)
-        if peer_possibilities.length == 8
-          #puts "spot #{row_index}, #{column_index} has peer possibilities: #{peer_possibilities}"
-          #puts "solution must be #{Board::DIGITS - [peer_possibilities]}"
-          spot.value = (Board::DIGITS - [peer_possibilities]).first
-        end
-        unless spot.solved?
-          spot.rule_out(board.common_digits(row_index, column_index))
-          spot.check_for_solution!
+    changed = true
+    while board.not_solved? && changed && !board.contradictory?
+      raise board.to_s if board.contradictory?
+      puts "trying to fill known squares for board:"
+      puts board
+      changed = false
+
+      board.rows.each_with_index do |row, row_index|
+        row.each_with_index do |spot, column_index|
+          #peer_possibilities = board.peer_possibilities(row_index, column_index)
+          unless spot.solved?
+            spot.rule_out(board.common_digits(row_index, column_index))
+            if spot.possibilities.length == 1
+              spot.value = spot.possibilities.first
+              changed = true
+            end
+          end
         end
       end
     end
@@ -24,38 +43,34 @@ class Sudoku < Struct.new(:board)
 
   def solution(board = self.board)
     if board.contradictory?
-      puts board
+      puts "BAILING ON BOARD"
       false
     elsif board.solved?
-      board
+      puts "***********"
+      puts "SOLVED A BOARDS :) :) :)"
+      board.to_s
     else
+      checked_boards << board.to_s
       fill_known(board)
-      all_boards = board.easiest_spots.each_with_index.map do |spot, index|
-        spot.possibilities.map do |p|
-          new_board = board.copy
-          puts "easy spot index #{index}"
-          puts spot
-          puts "value: #{p}"
-          new_board.easiest_spots[index].value = p
-          new_board
+      if board.solved?
+        raise "booooooom"
+        board.to_s
+      else
+        puts "WILL CHECK N: #{board.easiest_spots.count} NEW BOARDS"
+        all_boards = board.easiest_spots.each_with_index.map do |spot, index|
+          spot.possibilities.map do |possible_digit|
+            new_board = board.copy
+            new_board.easiest_spots[index].value = possible_digit
+            new_board
+          end
+        end.flatten
+        all_boards.reject do |b|
+          checked_boards.include?(b.to_s)
+        end.detect do |b|
+          solution(b)
         end
-      end.flatten
-      all_boards.reject(&:contradictory?).detect do |b|
-        solution(b)
       end
     end
-
-    #while board.not_solved? do
-      #board.rows.each_with_index do |row, row_index|
-        #row.each_with_index do |spot, column_index|
-          #unless spot.solved?
-            #spot.rule_out(board.common_digits(row_index, column_index))
-            #spot.check_for_solution!
-          #end
-        #end
-      #end
-    #end
-    #board.to_s
   end
 end
 
@@ -105,6 +120,14 @@ class Board
   end
 
   def contradictory?
+    contradictory_units? || unsolveable_spots?
+  end
+
+  def unsolveable_spots?
+    spots.reject(&:solved?).any? { |s| s.possibilities.empty? }
+  end
+
+  def contradictory_units?
     units.any? do |u|
       vals = u.map(&:value).compact
       vals.uniq.length < vals.length
