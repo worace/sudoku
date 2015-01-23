@@ -21,6 +21,10 @@ class MapSolver
     values[position] = values[position] - vals
   end
 
+  def filled?
+    positions.all? { |p| values[p].length == 1 }
+  end
+
   def positions
     ("A".."I").to_a.product((1..9).to_a).map { |a| a.join("") }
   end

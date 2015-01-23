@@ -104,6 +104,16 @@ describe MapSolver do
       assert_equal ["1","2","4","5","6","8","9"], solver.values["A2"]
     end
   end
+
+  describe "#filled?" do
+    it "is false if any positions have more than one possible value" do
+      refute MapSolver.new(@grid).filled?
+    end
+
+    it "is true if all positions are filled with a single value" do
+      assert MapSolver.new(@grid.gsub(" ", "1")).filled?
+    end
+  end
 end
 
 
