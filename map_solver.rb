@@ -2,7 +2,7 @@ class MapSolver
   COL_HEADS = (1..9).to_a.map(&:to_s)
   ROW_HEADS = ("A".."I").to_a
 
-  attr_reader :grid
+  attr_reader :grid, :values
 
   def initialize(grid="")
     @grid = grid
@@ -17,8 +17,8 @@ class MapSolver
     Hash[positions.zip(possibilities_list)]
   end
 
-  def values(position)
-    @values.fetch(position)
+  def eliminate(position, *vals)
+    values[position] = values[position] - vals
   end
 
   def positions

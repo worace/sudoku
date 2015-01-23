@@ -89,9 +89,19 @@ describe MapSolver do
     end
 
     it "gives remaining possible values for provided position (solved position has 1 possible value)" do
-      assert_equal "8", @solver.values("A1")
-      assert_equal MapSolver::COL_HEADS, @solver.values("A2")
-      assert_equal MapSolver::COL_HEADS, @solver.values("B1")
+      assert_equal "8", @solver.values["A1"]
+      assert_equal MapSolver::COL_HEADS, @solver.values["A2"]
+      assert_equal MapSolver::COL_HEADS, @solver.values["B1"]
+    end
+  end
+
+  describe "#eliminate" do
+    it "removes provided value from values for provided position" do
+      solver = MapSolver.new(@grid)
+      assert_equal MapSolver::COL_HEADS, solver.values["A2"]
+      solver.eliminate("A2", "3")
+      solver.eliminate("A2", "7")
+      assert_equal ["1","2","4","5","6","8","9"], solver.values["A2"]
     end
   end
 end
