@@ -12,13 +12,49 @@ class MapSolver
   def parse_grid
     chars = grid.split("") - ["\n"]
     possibilities_list = chars.map do |char|
-                           char == " " ? COL_HEADS : char
+                           char == " " ? COL_HEADS : [char]
                          end
     Hash[positions.zip(possibilities_list)]
   end
 
-  def eliminate(position, *vals)
-    values[position] = values[position] - vals
+#def assign(values, s, d):
+    #"""Eliminate all the other values (except d) from values[s] and propagate.
+    #Return values, except return False if a contradiction is detected."""
+    #other_values = values[s].replace(d, '')
+    #if all(eliminate(values, s, d2) for d2 in other_values):
+        #return values
+    #else:
+        #return False
+  def assign(position, solution)
+    #eliminate values besides the solution from the position's values
+    #non_sols = values[position] - [solution]
+    #if non_sols.all? { |value| eliminate([value], position) }
+      #values
+    #else
+      #false
+    #end
+  end
+
+  def eliminate(values, position)
+    return values unless (self.values[position] & values).any?
+    puts "eliminate #{values} from #{position}"
+    self.values[position] = (self.values[position] - values)
+    if self.values[position].empty?
+      puts  "RETURNING FALSE, removed last possibility"
+      #eliminated all possibilities; return false to indicate invalid
+      false
+    elsif self.values[position].length == 1
+      #puts "will eliminate #{self.values[position]} from #{peers(position)}"
+      done = peers(position).all? do |peer|
+        puts "eliminate #{self.values[position]} from #{peer}"
+        eliminate(self.values[position], peer)
+        #raise "#{peer}, #{self.values[position]}" unless eliminate(self.values[position], peer)
+      end
+      puts "done? #{done}"
+      done
+    else
+      true
+    end
   end
 
   def filled?

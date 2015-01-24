@@ -89,20 +89,102 @@ describe MapSolver do
     end
 
     it "gives remaining possible values for provided position (solved position has 1 possible value)" do
-      assert_equal "8", @solver.values["A1"]
+      assert_equal ["8"], @solver.values["A1"]
       assert_equal MapSolver::COL_HEADS, @solver.values["A2"]
       assert_equal MapSolver::COL_HEADS, @solver.values["B1"]
     end
   end
 
+  describe "#assign" do
+    it "assigns provided value to provided position" do
+      
+    end
+
+    it "removes provided value from position's peers" do
+
+    end
+
+    it "returns false if an assignment would result in a contradiction" do
+
+    end
+
+    it "returns the updated values resulting from the assignment" do
+      
+    end
+  end
+
+  #"""Eliminate d from values[s]; propagate when values or places <= 2.
+  #Return values, except return False if a contradiction is detected."""
   describe "#eliminate" do
     it "removes provided value from values for provided position" do
       solver = MapSolver.new(@grid)
       assert_equal MapSolver::COL_HEADS, solver.values["A2"]
-      solver.eliminate("A2", "3")
-      solver.eliminate("A2", "7")
+      solver.eliminate(["3"], "A2")
+      solver.eliminate(["7"], "A2")
       assert_equal ["1","2","4","5","6","8","9"], solver.values["A2"]
     end
+
+    it "eliminates multiple values" do
+      solver = MapSolver.new(@grid)
+      assert_equal MapSolver::COL_HEADS, solver.values["A2"]
+      solver.eliminate(["1", "2", "3"], "A2")
+      assert_equal ["4","5","6","7","8","9"], solver.values["A2"]
+    end
+
+    it "does not remove already eliminated value" do
+      solver = MapSolver.new(@grid)
+      filled_position, solution = solver.values.find { |k,v| v.length == 1 }
+      solver.eliminate(MapSolver::COL_HEADS - solution, filled_position)
+      assert_equal solution, solver.values[filled_position]
+    end
+
+    it "returns false if the position already has a value" do
+      solver = MapSolver.new(@grid)
+      filled_position, solution = solver.values.find { |k,v| v.length == 1 }
+      assert_equal false, solver.eliminate(solution, filled_position)
+    end
+
+    it "returns false if the value is not a possibility for the position" do
+      skip
+      #solver = MapSolver.new(@grid)
+      #unfilled_position, possibilities = solver.values.find { |k,v| v.length > 1 && v.length < 9 }
+      #assert_equal false, solver.eliminate(solution, filled_position)
+    end
+
+    it "eliminates positions solution from its peers if 1 value remains in position" do
+      solver = MapSolver.new(@grid)
+      # F2 possibilities are 9 and 5; 9 is invalid, eliminate it leaving 5
+      # 5 should then not be a possibility for any peer of F2
+      position = "F2"
+      remove = ["9"]
+      solution = ["5"]
+      solver.values[position] = ["5", "9"]
+      solver.eliminate(remove, position)
+      assert_equal solution, solver.values[position]
+      contradictions = []
+      solver.peers(position).each do |peer|
+        if (solver.values[peer] & solution).any?
+          contradictions << [peer, solver.values[peer]]
+        end
+      end
+      refute contradictions.any?, "failure, value: #{solution} should not appear in #{Hash[contradictions]}"
+    end
+
+    it "fills in values in units where only 1 place for that value to go" do
+      solver = MapSolver.new(@grid)
+      #F2 and F8 are "naked twins" -- each has 5 and 9 as possibility
+      #removing 9 from F2 should cause it to be filled in for F8
+      position = "F2"
+      twin = "F8"
+      remove = ["9"]
+      solution = ["5"]
+      solver.values[position] = ["5", "9"]
+      solver.values[twin] = ["5", "9"]
+      solver.eliminate(remove, position)
+      assert_equal solution, solver.values[position]
+      assert_equal remove, solver.values[twin]
+    end
+
   end
 
   describe "#filled?" do
@@ -115,6 +197,16 @@ describe MapSolver do
     end
   end
 end
+ #123456789
+#A8  5 4  7
+#B  5 3 9  
+#C 9 7 1 6 
+#D1 3   2 8
+#E 4     5 
+#F2 78136 4
+#G 3 9 2 8 
+#H  2 7 5  
+#I6  3 5  1
 
 
  #A1 A2 A3| A4 A5 A6| A7 A8 A9    4 . . |. . . |8 . 5     4 1 7 |3 6 9 |8 2 5 
