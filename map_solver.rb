@@ -37,20 +37,14 @@ class MapSolver
 
   def eliminate(values, position)
     return values unless (self.values[position] & values).any?
-    puts "eliminate #{values} from #{position}"
     self.values[position] = (self.values[position] - values)
     if self.values[position].empty?
-      puts  "RETURNING FALSE, removed last possibility"
       #eliminated all possibilities; return false to indicate invalid
       false
     elsif self.values[position].length == 1
-      #puts "will eliminate #{self.values[position]} from #{peers(position)}"
       done = peers(position).all? do |peer|
-        puts "eliminate #{self.values[position]} from #{peer}"
         eliminate(self.values[position], peer)
-        #raise "#{peer}, #{self.values[position]}" unless eliminate(self.values[position], peer)
       end
-      puts "done? #{done}"
       done
     else
       true
