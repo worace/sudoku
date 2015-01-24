@@ -11,51 +11,44 @@ class MapSolver
   end
 
   def solve(values = self.values)
+    raise "#{values.inspect}; #{values.class}" unless [Hash, FalseClass].include?(values.class)
     if values == false
       false
     elsif solved?(values)
+      raise values.inspect unless values.is_a?(Hash)
       puts "SOLVED for obj: #{values.object_id} -- #{values.class};"
-      $solution = values
-      #return values
-      return $solution
+      values
     else
       easiest = easiest_position(values)
-      #values[easiest].find do |val|
-        #assign_result = assign(val, easiest, values.dup)
-        #puts assign_result
-        #solve(assign_result)
-      #end
-      values[easiest].map do |val|
-        assign(val, easiest, values.dup)
-      end.find do |result|
-        solve(result)
+      some(values[easiest]) do |val|
+        solve(assign(val, easiest, values.dup))
       end
     end
   end
 
-  def easiest_position(values)
-    easiest,_ = values.select { |pos, vals| vals.length > 1 }.min_by { |pos, vals| vals.length }
-    easiest
-  end
-
-  def solved?(values = self.values)
-    values.all? { |k,v| v.length == 1 }
-  end
-
-  def parse_grid
-    chars = grid.split("") - ["\n"]
-    possibilities_list = chars.map do |char|
-                           char == " " ? COL_HEADS : [char]
-                         end
-    Hash[positions.zip(possibilities_list)]
+  def some(enum, &block)
+    puts "will check some for #{enum}"
+    enum.each do |obj|
+      val = yield(obj)
+      puts "yielded val: #{val}"
+      if val != false
+        puts "some found non-false val: #{val}"
+        return val
+      end
+    end
+    false
   end
 
   def assign(value, position, values = self.values)
+    puts "will assign #{value} to #{position}; currently: #{values[position]}"
     #eliminate values besides the solution from the position's values
     non_sols = values[position] - [value]
     if non_sols.all? { |val| eliminate([val], position, values) }
+      raise values.inspect unless values.is_a?(Hash)
+      puts "assign returning values: #{values.class}"
       values
     else
+      puts "assign returning false"
       false
     end
   end
@@ -74,6 +67,23 @@ class MapSolver
     else
       true
     end
+  end
+
+  def easiest_position(values)
+    easiest,_ = values.select { |pos, vals| vals.length > 1 }.min_by { |pos, vals| vals.length }
+    easiest
+  end
+
+  def solved?(values = self.values)
+    values.all? { |k,v| v.length == 1 }
+  end
+
+  def parse_grid
+    chars = grid.split("") - ["\n"]
+    possibilities_list = chars.map do |char|
+                           char == " " ? COL_HEADS : [char]
+                         end
+    Hash[positions.zip(possibilities_list)]
   end
 
   def filled?

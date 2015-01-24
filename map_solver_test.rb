@@ -219,12 +219,18 @@ describe MapSolver do
 
   describe "#solve" do
     it "solves" do
-      solved = MapSolver.new(@solved_grid).values
+      solved = {"A1"=>["8"], "A2"=>["2"], "A3"=>["6"], "A4"=>["5"], "A5"=>["9"], "A6"=>["4"], "A7"=>["3"], "A8"=>["1"], "A9"=>["7"], "B1"=>["7"], "B2"=>["1"], "B3"=>["5"], "B4"=>["6"], "B5"=>["3"], "B6"=>["8"], "B7"=>["9"], "B8"=>["4"], "B9"=>["2"], "C1"=>["3"], "C2"=>["9"], "C3"=>["4"], "C4"=>["7"], "C5"=>["2"], "C6"=>["1"], "C7"=>["8"], "C8"=>["6"], "C9"=>["5"], "D1"=>["1"], "D2"=>["6"], "D3"=>["3"], "D4"=>["4"], "D5"=>["5"], "D6"=>["9"], "D7"=>["2"], "D8"=>["7"], "D9"=>["8"], "E1"=>["9"], "E2"=>["4"], "E3"=>["8"], "E4"=>["2"], "E5"=>["6"], "E6"=>["7"], "E7"=>["1"], "E8"=>["5"], "E9"=>["3"], "F1"=>["2"], "F2"=>["5"], "F3"=>["7"], "F4"=>["8"], "F5"=>["1"], "F6"=>["3"], "F7"=>["6"], "F8"=>["9"], "F9"=>["4"], "G1"=>["5"], "G2"=>["3"], "G3"=>["1"], "G4"=>["9"], "G5"=>["4"], "G6"=>["2"], "G7"=>["7"], "G8"=>["8"], "G9"=>["6"], "H1"=>["4"], "H2"=>["8"], "H3"=>["2"], "H4"=>["1"], "H5"=>["7"], "H6"=>["6"], "H7"=>["5"], "H8"=>["3"], "H9"=>["9"], "I1"=>["6"], "I2"=>["7"], "I3"=>["9"], "I4"=>["3"], "I5"=>["8"], "I6"=>["5"], "I7"=>["4"], "I8"=>["2"], "I9"=>["1"]}
+      #solved = MapSolver.new(@solved_grid).values
       solution = MapSolver.new(@grid).solve
-      puts "solution #{solution.object_id}; #{solution.class}; solution "
-      puts "$global solution #{$solution.object_id}; #{$solution.class}; solution"
-      assert_equal solved, $solution
-      #assert_equal solved, $solution
+      assert_equal solved, solution
+    end
+  end
+
+  describe "#some" do
+    it "finds first value of provided block which does not return false" do
+      values = [false, {"A1" => ["1"], "A2" => ["2"]}]
+      solver = MapSolver.new("")
+      assert_equal values[1], solver.some(values) { |a| solver.solve(a) }
     end
   end
 end
