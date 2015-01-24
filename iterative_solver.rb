@@ -1,4 +1,4 @@
-class Sudoku < Struct.new(:board)
+class IterativeSolver < Struct.new(:board)
   def solution
     while board.not_solved? do
       board.rows.each_with_index do |row, row_index|
