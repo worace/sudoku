@@ -9,6 +9,26 @@ class MapSolver
     @values = parse_grid
   end
 
+  def solve(values = self.values)
+    if values == false
+      false
+    elsif solved?(values)
+      values
+    else
+      easiest,_ = values.select { |pos, vals| vals.length > 1 }.min_by { |pos, vals| vals.length }
+      values[easiest].find do |val|
+        puts "will search with assigning #{val}"
+        assign_result = assign(val, easiest, values.dup)
+        puts assign_result
+        solve(assign_result)
+      end
+    end
+  end
+
+  def solved?(values = self.values)
+    values.all? { |k,v| v.length == 1 }
+  end
+
   def parse_grid
     chars = grid.split("") - ["\n"]
     possibilities_list = chars.map do |char|
@@ -29,7 +49,7 @@ class MapSolver
     #eliminate values besides the solution from the position's values
     non_sols = values[position] - [value]
     if non_sols.all? { |val| eliminate([val], position, values) }
-      self.values
+      values
     else
       false
     end

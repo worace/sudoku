@@ -12,6 +12,7 @@ describe MapSolver do
   before do
     @solver = MapSolver.new
     @grid = File.read("./sample_puzzle_1.txt")
+    @solved_grid = File.read("./sample_solution_1.txt")
   end
 
   describe "#positions" do
@@ -163,13 +164,6 @@ describe MapSolver do
       assert_equal false, solver.eliminate(solution, filled_position)
     end
 
-    it "returns false if the value is not a possibility for the position" do
-      skip
-      #solver = MapSolver.new(@grid)
-      #unfilled_position, possibilities = solver.values.find { |k,v| v.length > 1 && v.length < 9 }
-      #assert_equal false, solver.eliminate(solution, filled_position)
-    end
-
     it "eliminates positions solution from its peers if 1 value remains in position" do
       solver = MapSolver.new(@grid)
       # F2 possibilities are 9 and 5; 9 is invalid, eliminate it leaving 5
@@ -213,6 +207,19 @@ describe MapSolver do
 
     it "is true if all positions are filled with a single value" do
       assert MapSolver.new(@grid.gsub(" ", "1")).filled?
+    end
+  end
+
+  describe "#solved?" do
+    it "is true for filled out grid" do
+      assert MapSolver.new(@solved_grid).solved?
+    end
+  end
+
+  describe "#solve" do
+    it "solves" do
+      solved = MapSolver.new(@solved_grid).values
+      assert_equal solved, MapSolver.new(@grid).solve
     end
   end
 end
