@@ -17,20 +17,15 @@ class MapSolver
       values
     else
       easiest = easiest_position(values)
-      values[easiest].each do |val|
-        solution = solve(assign(val, easiest, values.dup))
-        if solution != false
-          return solution
-        end
+      some(values[easiest]) do |val|
+        solve(assign(val, easiest, values.dup))
       end
-      false
     end
   end
 
   def some(enum, &block)
     enum.each do |obj|
-      val = yield(obj)
-      if val != false
+      if val = yield(obj)
         return val
       end
     end

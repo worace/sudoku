@@ -5,8 +5,9 @@ require 'minitest/pride'
 require 'minitest/spec'
 require "./map_solver"
 require "pry"
+require "timeout"
 
-def sudoku_for(puzzle_path)
+def grid(puzzle_name)
 end
 
 describe MapSolver do
@@ -218,11 +219,33 @@ describe MapSolver do
   end
 
   describe "#solve" do
-    it "solves" do
+    it "solves an easy puzzle" do
       solved = {"A1"=>["8"], "A2"=>["2"], "A3"=>["6"], "A4"=>["5"], "A5"=>["9"], "A6"=>["4"], "A7"=>["3"], "A8"=>["1"], "A9"=>["7"], "B1"=>["7"], "B2"=>["1"], "B3"=>["5"], "B4"=>["6"], "B5"=>["3"], "B6"=>["8"], "B7"=>["9"], "B8"=>["4"], "B9"=>["2"], "C1"=>["3"], "C2"=>["9"], "C3"=>["4"], "C4"=>["7"], "C5"=>["2"], "C6"=>["1"], "C7"=>["8"], "C8"=>["6"], "C9"=>["5"], "D1"=>["1"], "D2"=>["6"], "D3"=>["3"], "D4"=>["4"], "D5"=>["5"], "D6"=>["9"], "D7"=>["2"], "D8"=>["7"], "D9"=>["8"], "E1"=>["9"], "E2"=>["4"], "E3"=>["8"], "E4"=>["2"], "E5"=>["6"], "E6"=>["7"], "E7"=>["1"], "E8"=>["5"], "E9"=>["3"], "F1"=>["2"], "F2"=>["5"], "F3"=>["7"], "F4"=>["8"], "F5"=>["1"], "F6"=>["3"], "F7"=>["6"], "F8"=>["9"], "F9"=>["4"], "G1"=>["5"], "G2"=>["3"], "G3"=>["1"], "G4"=>["9"], "G5"=>["4"], "G6"=>["2"], "G7"=>["7"], "G8"=>["8"], "G9"=>["6"], "H1"=>["4"], "H2"=>["8"], "H3"=>["2"], "H4"=>["1"], "H5"=>["7"], "H6"=>["6"], "H7"=>["5"], "H8"=>["3"], "H9"=>["9"], "I1"=>["6"], "I2"=>["7"], "I3"=>["9"], "I4"=>["3"], "I5"=>["8"], "I6"=>["5"], "I7"=>["4"], "I8"=>["2"], "I9"=>["1"]}
-      #solved = MapSolver.new(@solved_grid).values
-      solution = MapSolver.new(@grid).solve
-      assert_equal solved, solution
+      assert_equal solved, MapSolver.new(@grid).solve
+    end
+
+    it "solves a harder puzzle" do
+      harder_grid = File.read("./sample_puzzle_2.txt")
+      solution_grid = File.read("./sample_solution_2.txt")
+      solved = MapSolver.new(solution_grid).values
+      assert_equal solved, MapSolver.new(harder_grid).solve
+    end
+
+    it "solves a bunch of puzzles" do
+      skip #uncomment this if you have a while
+      times = []
+      checker = MapSolver.new
+      Dir.glob("sample_puzzles/*.txt").each do |file|
+        start = Time.now
+        puts "attempting to solve puzzle #{file}"
+        solution = MapSolver.new(File.read("./#{file}")).solve
+        assert solution
+        assert checker.solved?(solution)
+        elapsed = Time.now - start
+        puts "solved puzzle #{file} in #{elapsed} seconds"
+        times << elapsed
+      end
+      puts "solved all puzzles in #{times}"
     end
   end
 
