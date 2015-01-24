@@ -25,14 +25,14 @@ class MapSolver
         #return values
     #else:
         #return False
-  def assign(position, solution)
+  def assign(value, position)
     #eliminate values besides the solution from the position's values
-    #non_sols = values[position] - [solution]
-    #if non_sols.all? { |value| eliminate([value], position) }
-      #values
-    #else
-      #false
-    #end
+    non_sols = self.values[position] - [value]
+    if non_sols.all? { |val| eliminate([val], position) }
+      self.values
+    else
+      false
+    end
   end
 
   def eliminate(values, position)

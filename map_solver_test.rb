@@ -97,19 +97,38 @@ describe MapSolver do
 
   describe "#assign" do
     it "assigns provided value to provided position" do
-      
+      solver = MapSolver.new(@grid)
+      position = "F2"
+      solution = "5"
+      assert solver.assign(solution, position)
+      assert_equal [solution], solver.values[position]
     end
 
     it "removes provided value from position's peers" do
-
+      solver = MapSolver.new(@grid)
+      position = "F2"
+      solution = "5"
+      assert solver.assign(solution, position)
+      overlaps = solver.peers(position).any? do |peer|
+        solver.values[peer].include?(solution)
+      end
+      refute overlaps
     end
 
     it "returns false if an assignment would result in a contradiction" do
-
+      solver = MapSolver.new(@grid)
+      position = "F2"
+      invalid = "9"
+      assert_equal false, solver.assign(invalid, position)
     end
 
     it "returns the updated values resulting from the assignment" do
-      
+      solver = MapSolver.new(@grid)
+      position = "F2"
+      solution = "5"
+      updated = solver.values.tap { |v| v[position] = [solution] }
+      assert_equal updated, solver.assign(solution, position)
+      assert_equal updated, solver.values
     end
   end
 
