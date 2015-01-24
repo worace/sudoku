@@ -30,23 +30,10 @@ describe Sudoku do
   end
 
   it "solves #2" do
-    skip
     sudoku_for("./sample_puzzle_2.txt").solution.inspect
   end
 
-  it "solves a hard board" do
-    skip
-    begin
-      Timeout::timeout(1) {
-        sudoku_for("./sample_puzzles/puzzle_1.txt").solution
-      }
-    rescue Timeout::Error
-      fail
-    end
-  end
-
   it "tells me which puzzles are solveable" do
-    skip
     #sample_puzzles/puzzle_0.txt
     #sample_puzzles/puzzle_11.txt
     #sample_puzzles/puzzle_16.txt
@@ -150,40 +137,6 @@ describe Board do
       copy = @board.copy
       assert (copy.spots.map(&:object_id) & @board.spots.map(&:object_id)).empty?
       assert_equal copy.spots.map(&:value), @board.spots.map(&:value)
-    end
-  end
-#   8  5 4  7
-#     5 3 9  
-#    9 7 1 6 
-#   1 3   2 8
-#    4     5 
-#   2 78136 4
-#    3 9 2 8 
-#     2 7 5  
-#   6  3 5  1
-
-  describe "#squares" do
-    it "finds 9x9 arrays of each square" do
-      assert_equal [8,nil,nil,nil,nil,5,nil,9,nil], @board.squares.first.flatten.map(&:value)
-      assert_equal [nil,8,nil,5,nil,nil,nil,nil,1], @board.squares.last.map(&:value)
-      assert_equal 9, @board.squares.count
-      assert_equal [9], @board.squares.map(&:count).uniq
-    end
-  end
-
-  describe "#contradictory?" do
-    it "is not contradictory to start" do
-      solved_board = Board.new(File.read("./sample_solution_1.txt"))
-      refute solved_board.contradictory?
-    end
-
-    it "is not contradictory for a valid board" do
-      refute @board.contradictory?
-    end
-
-    it "can detect if duplicate squares have been inserted" do
-      @board.spots.first.value = (Board::DIGITS - @board.spots.first.possibilities).first
-      assert_equal true, @board.contradictory?
     end
   end
 end
