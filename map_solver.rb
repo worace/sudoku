@@ -2,7 +2,8 @@ class MapSolver
   COL_HEADS = (1..9).to_a.map(&:to_s)
   ROW_HEADS = ("A".."I").to_a
 
-  attr_reader :grid, :values
+  attr_reader :grid
+  attr_accessor :values
 
   def initialize(grid="")
     @grid = grid
@@ -13,16 +14,28 @@ class MapSolver
     if values == false
       false
     elsif solved?(values)
-      values
+      puts "SOLVED for obj: #{values.object_id} -- #{values.class};"
+      $solution = values
+      #return values
+      return $solution
     else
-      easiest,_ = values.select { |pos, vals| vals.length > 1 }.min_by { |pos, vals| vals.length }
-      values[easiest].find do |val|
-        puts "will search with assigning #{val}"
-        assign_result = assign(val, easiest, values.dup)
-        puts assign_result
-        solve(assign_result)
+      easiest = easiest_position(values)
+      #values[easiest].find do |val|
+        #assign_result = assign(val, easiest, values.dup)
+        #puts assign_result
+        #solve(assign_result)
+      #end
+      values[easiest].map do |val|
+        assign(val, easiest, values.dup)
+      end.find do |result|
+        solve(result)
       end
     end
+  end
+
+  def easiest_position(values)
+    easiest,_ = values.select { |pos, vals| vals.length > 1 }.min_by { |pos, vals| vals.length }
+    easiest
   end
 
   def solved?(values = self.values)
@@ -37,14 +50,6 @@ class MapSolver
     Hash[positions.zip(possibilities_list)]
   end
 
-#def assign(values, s, d):
-    #"""Eliminate all the other values (except d) from values[s] and propagate.
-    #Return values, except return False if a contradiction is detected."""
-    #other_values = values[s].replace(d, '')
-    #if all(eliminate(values, s, d2) for d2 in other_values):
-        #return values
-    #else:
-        #return False
   def assign(value, position, values = self.values)
     #eliminate values besides the solution from the position's values
     non_sols = values[position] - [value]

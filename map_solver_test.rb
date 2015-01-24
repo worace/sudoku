@@ -4,6 +4,7 @@ require 'minitest/autorun'
 require 'minitest/pride'
 require 'minitest/spec'
 require "./map_solver"
+require "pry"
 
 def sudoku_for(puzzle_path)
 end
@@ -219,7 +220,11 @@ describe MapSolver do
   describe "#solve" do
     it "solves" do
       solved = MapSolver.new(@solved_grid).values
-      assert_equal solved, MapSolver.new(@grid).solve
+      solution = MapSolver.new(@grid).solve
+      puts "solution #{solution.object_id}; #{solution.class}; solution "
+      puts "$global solution #{$solution.object_id}; #{$solution.class}; solution"
+      assert_equal solved, $solution
+      #assert_equal solved, $solution
     end
   end
 end
