@@ -11,28 +11,26 @@ class MapSolver
   end
 
   def solve(values = self.values)
-    raise "#{values.inspect}; #{values.class}" unless [Hash, FalseClass].include?(values.class)
     if values == false
       false
     elsif solved?(values)
-      raise values.inspect unless values.is_a?(Hash)
-      puts "SOLVED for obj: #{values.object_id} -- #{values.class};"
       values
     else
       easiest = easiest_position(values)
-      some(values[easiest]) do |val|
-        solve(assign(val, easiest, values.dup))
+      values[easiest].each do |val|
+        solution = solve(assign(val, easiest, values.dup))
+        if solution != false
+          return solution
+        end
       end
+      false
     end
   end
 
   def some(enum, &block)
-    puts "will check some for #{enum}"
     enum.each do |obj|
       val = yield(obj)
-      puts "yielded val: #{val}"
       if val != false
-        puts "some found non-false val: #{val}"
         return val
       end
     end
@@ -40,15 +38,11 @@ class MapSolver
   end
 
   def assign(value, position, values = self.values)
-    puts "will assign #{value} to #{position}; currently: #{values[position]}"
     #eliminate values besides the solution from the position's values
     non_sols = values[position] - [value]
     if non_sols.all? { |val| eliminate([val], position, values) }
-      raise values.inspect unless values.is_a?(Hash)
-      puts "assign returning values: #{values.class}"
       values
     else
-      puts "assign returning false"
       false
     end
   end
