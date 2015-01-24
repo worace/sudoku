@@ -25,25 +25,25 @@ class MapSolver
         #return values
     #else:
         #return False
-  def assign(value, position)
+  def assign(value, position, values = self.values)
     #eliminate values besides the solution from the position's values
-    non_sols = self.values[position] - [value]
-    if non_sols.all? { |val| eliminate([val], position) }
+    non_sols = values[position] - [value]
+    if non_sols.all? { |val| eliminate([val], position, values) }
       self.values
     else
       false
     end
   end
 
-  def eliminate(values, position)
-    return values unless (self.values[position] & values).any?
-    self.values[position] = (self.values[position] - values)
-    if self.values[position].empty?
+  def eliminate(elim_vals, position, values = self.values)
+    return elim_vals unless (values[position] & elim_vals).any?
+    values[position] = (values[position] - elim_vals)
+    if values[position].empty?
       #eliminated all possibilities; return false to indicate invalid
       false
-    elsif self.values[position].length == 1
+    elsif values[position].length == 1
       done = peers(position).all? do |peer|
-        eliminate(self.values[position], peer)
+        eliminate(values[position], peer, values)
       end
       done
     else
